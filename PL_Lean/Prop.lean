@@ -9,12 +9,12 @@ Lean provides a rich and powerful type to model mathematical propositions: the t
 -/
 
 #check Prop
--- #eval Prop -- we can't evaluate a `Prop`: it is a type
+-- #eval Prop -- we can't evaluate `Prop`: it is a type
 
 /-
-The elements of `Prop` are called propositions.
+The elements of `Prop` are called propositions. We denote them with latin capital letters: P, Q, R and so on. The notation `P : Prop` stands for "P is a proposition".
 
-The examples and theorems we saw in the first lesson all contained propositions. In other words, what you type in between `:` and `:=` is an element of the type `Prop`.
+Every example and theorem we saw in the first lesson revolved around a proposition, which was specified between the `:` and `:=` tokens.
 
 By default, two propositions are defined in any Lean program: `True` and `False`.
 -/
@@ -30,7 +30,7 @@ Given a proposition `P : Prop`, its elements are called *proofs*. Proofs are val
 
 Proofs are opened with the keyword `by` and built incrementally using tactics. So, what you type after the `:=` symbol in examples and theorems is the proof of the previous logical statement.
 
-Let's start with the simplest of propositions: `True`. `True` has one element, its constructor `True.intro`, which is the proof that `True` is indeed true.
+Let's start proving the simplest of propositions: `True`. `True` has one element, its constructor `True.intro`, which is the proof that `True` is indeed true.
 
 To use its constrctor in its proof, we need the tactic `exact`. When the goal is `P` and we have a value `p : P` in the proof's context or in the global environment, `exact p` closes the goal. In general, `exact` accepts any expression that evaluates to a value of type `P`.
 
@@ -40,31 +40,27 @@ Try using `exact` to prove `True`:
 example : True := by sorry
 
 /-
-`False` on the other hand, can't be proved, because we can't build a value belonging to its type (we saw above that it has no constructors). `False` represents the empty set and all prositions that can not be proved are equivalent to `False`.
+`False` on the other hand, can't be proved, because we can't build a value belonging to its type (we saw above that it has no constructors). `False` represents the empty set. Prositions that can not be proved are equivalent to `False`.
 
-# Logical connectives
+## Logical connectives
 
-The elements of `Prop` are denoted with capital letters: `P Q R` and so on.
+We can build larger and more interesting propositions out of existing ones using *logical connectives*. In this tutorial we'll study the connectives `→`, `∧`, `∨` and their associated tactics.
 
-We can build larger and more interesting propositions out of existing ones using *logical connectives*.
-
-We're going to study the connectives →, ∧, ∨ and their associated tactics.
-
-Logical connectives form compound propositions; the *structure* of a compound proposition, that is which connectives appear where, conveys the tactics to use to build its proof.
+Logical connectives form compound propositions; the *structure* of a compound proposition arises from which connectives appear where and it conveys the tactics required to build its proof.
 
 Each logical connective is characterized by its own *introduction* and *elimination* rules:
-* Introduction rules allows use to *build* proofs of the compound proposition
-* Elimination rules allows us to *destruct* the compound proposition when it is an assumption to prove something else.
+* Introduction rules allow us to *build* proofs of the compound proposition
+* Elimination rules allow us to *destruct* the compound proposition when it is an assumption to prove something else.
 
-## Implication
+### Implication
 
 The first operation we see is the implication, written `→`.
 The proposition `P → Q` states that if `P` holds, then `Q` also holds.
-We refer to `P` as the *premise* and `Q` as the *conclusion* or *goal* of the implication.
+We refer to `P` as the *antecedent* and `Q` as the *consequent* of the implication.
 
 When the goal is `P → Q`, we can use the tactic `intro`, which moves the `P` from the goal into the proof context and transforms the goal to `Q`. This is the introduction rule of implication.
 
-Then, can work with the assumption `p : P` to build a proof of `Q`. We can use `exact` if we can come up with a value that proves `Q`. Try it now with:
+After this move we can work with the assumption `p : P` to build a proof of `Q`. We can use `exact` if we can come up with a value that promptly proves `Q`. Try it now:
 -/
 
 example {P : Prop} : P → P := by sorry
@@ -73,18 +69,18 @@ example {P : Prop} : P → P := by sorry
 A goal composed of iterated implications gives you as many hypotheses to work with as there are arrows. This behaviour follows from the fact that the implication operator `→` is right-associative. You can introduce these hypotheses and name their proof objects however you like by specifying their names after `intro`, as in `intro p q r`. Try it:
 -/
 
-example {P Q R S T : Prop} : P → S → T → Q → R := by sorry
+example {P Q R S T : Prop} : P → S → R → T → Q → R := by sorry
 
 /-
-When we have an implication `h : P → Q` as an hypothesis and the goal asks us to prove `Q`, we can *apply* `h` to the goal, transforming it to `P`. This is the first elimination rule of implication which lets us reason backwards, from the conclusion to the premises. If we then have `P` in our context, `exact p` will solve the goal and we're done.
+When we have an implication `h : P → Q` as an hypothesis and the goal asks us to prove `Q`, we can *apply* `h` to the goal, transforming it to `P`. This is the first elimination rule of implication which lets us reason backwards, from the consequence to the premise. If we then have `P` in our context, `exact p` will solve the goal and we're done.
 
-There's also the tactic `assumption`, which closes the goal automatically when one of the hyposetheses exactly matches the goal. Try using both strategies in the following exercise:
+There's also the tactic `assumption`, which closes the goal automatically when one of the hyposetheses exactly matches the goal. Try using either strategy in the following exercise:
 -/
 
 example {P Q : Prop} : P → (P → Q) → Q := by sorry
 
 /-
-We can also apply an implication `h : P → Q` in our context to another object `p : P` in the context, resulting in a new proposition of type `Q`. This is called *forward reasoning* and corresponds to the second form of elimination rule of implication.
+We can also apply an implication `h : P → Q` in our context to another object `p : P` in the context, resulting in a new proposition of type `Q`. This second form of elimination rule of implication enables *forward reasoning*, exploiting the premises at hand to obtain the conclusion.
 
 To give a name to the result of applying `h` to `p`, called `h p`, we can use the tactic `have`.
 
@@ -95,9 +91,9 @@ example {P Q R S : Prop} : P → (Q → R → S) → (P → Q) → (P → R) →
 sorry
 
 /-
-# Conjunction
+### Conjunction
 
-When our goal is a conjunction `P ∧ Q`, we are required to prove both sides. To do so, the `constructor` tactic splits the proof into two sub-goals, a first one that has you prove `P` and a second one that has you prove `Q`. Closing both goals means you have proved the conjunction.
+A logical conjunction holds when both of its conjuncts hold. So, when our goal is a conjunction `P ∧ Q`, we are required to prove both of its terms. To do so, we employ `constructor` tactic splits the proof into two sub-goals, a first one that has you prove `P` and a second one that has you prove `Q`. Closing both goals means you have proved the conjunction successfully.
 -/
 
 example {P Q : Prop} : P → Q → P ∧ Q := by sorry
@@ -109,43 +105,44 @@ Conversely, having a conjuction `h : P ∧ Q` in your context is great, it means
 theorem and_true_right {B : Prop} : B ∧ True → B := by sorry
 
 /-
-# Disjunction
+### Disjunction
 
+A logical disjunction holds when either of its alternatives hold. Logical disjunction is *inclusive*, meaning that it still holds when both terms hold.
 Proving a disjunction is an easier task than proving a conjunction: to prove `P ∨ Q` it suffices to prove either the left or the right side. If you want to prove `P`, use `left`, where to prove `Q` you use `right`. After finishing either proof you'll have successfully proved `P ∨ Q`. Try using both:
 -/
 
 example {P Q : Prop} : (P → P ∨ Q) ∧ (Q → P ∨ Q) := by sorry
 
 /-
-On the other hand, making use of an assumption `h : P ∨ Q` in our context is a bit of a pain, because it splits your proof into two parallel realities: one where `P` holds and `Q` is missing, and the other where `Q` holds and `P` is missing. In other words, if the goal is `R`, we are asked to prove `P → R` and `Q → R` separately.
+On the other hand, exploiting an disjunction `h : P ∨ Q` in our context requires more effort, because it splits your proof into two parallel realities: one where `P` holds and `Q` is missing, and the other where `Q` holds and `P` is missing. In other words, if the goal is `R`, we are asked to prove `P → R` and `Q → R` separately.
 
 The tactic `cases` enters such proof state. It takes as argument the hypothesis to destruct into its cases, `cases h`. First it asks you prove the first sub-goal where you have `p : P`, then Lean automatically switches the context to the second sub-goal where you have `q : Q`.
 
 Note: `cases` has the drawback that it chooses the names of the new objects automatically; these might not suit your naming conventions and could probably hurt the readibility of your proof!
 
-The tactic `rcases` ("recursive cases") is a better tool most of the time because it lets use specify a pattern by which to name the objects introduced in each alternative case. To destruct and assign names to the cases of a disjunction `h : P ∨ Q`, we write `rcases h with p | q` where `p | q` is the pattern.
+The tactic `rcases` ("recursive cases") is a better tool most of the time because it lets us specify a pattern by which to name the objects introduced in each alternative case. To destruct and assign names to the cases of a disjunction `h : P ∨ Q`, we write `rcases h with p | q` where `p | q` is the pattern.
 -/
 
 theorem or_symm {P Q : Prop} : P ∨ Q → Q ∨ P := by sorry
 
 /-
-## Co-implication
+### Co-implication
 
-`P ↔ Q` is defined in Lean and logic as `(P → Q) ∨ (Q → P)`, it asserts that an implication that holds in both directions. This establishes a *logical equivalence* among `P` and `Q`. Being a conjunction under the hood, to prove a proposition `P ↔ Q` we reuse the introduction rule of conjuction, therefore we must prove both of its sides using `constructor`. Try it:
+`P ↔ Q` is defined in Lean and in logic as `(P → Q) ∨ (Q → P)`. It asserts that an implication that holds in both directions. This definition establishes a *logical equivalence* among `P` and `Q`: if `P` holds, then `Q` holds and vice versa. Being a conjunction under the hood, to prove a proposition `P ↔ Q` we reuse the introduction rule of conjuction, therefore we must prove both of its sides using `constructor`. Try it now:
 -/
 
 example {P : Prop} : P ↔ P := by sorry
 
 /-
-Conversely, having a `p : P ↔ Q` in your assumptions means that you can obtain a proof for `Q` from one of `P` and vice versa, depending on the context of course. The elimination rule for conjunction applies again: given the proof of a conjunction `h`, you can access its left side with `h.1` and its right side with `h.2`.
+Conversely, having a `p : P ↔ Q` in your assumptions means that you can obtain a proof for `Q` from one of `P` and vice versa, depending on the context at hand of course. The elimination rules for conjunction apply here too: given the proof of a co-implication `h`, you can access its left side with `h.1` and its right side with `h.2`.
 -/
 
 example {A B : Prop} (a : A) : (B ↔ A) → B := by sorry
 
 /-
-## Exercises
+### Exercises
 
-Solve the exercise below with the tactices we've introduced in this lesson.
+Solve the exercises below with the tactics we've introduced in this lesson.
 -/
 
 -- Does the opposite implication hold?
