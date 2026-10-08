@@ -1159,16 +1159,6 @@ theorem addN_one_right (n : Nat) : addN n 1 = Nat.succ n := by
 
 
 /-
-### Exercise: Adding successors
-
-Prove the following property. Hint: use existing properties about addN and successors
--/
-
-theorem addN_self_succ (n : Nat) : addN (n + 1) (n + 1) = addN n n + 1 + 1 := by
-  sorry
-
-
-/-
 ### Exercise: Repeated rewriting
 
 Use `addN_succ_right` twice.  Observe the goal in the Infoview after each
@@ -1273,13 +1263,16 @@ theorem not_eqN_of_false (a b : Nat) (h : eqN a b = false) :
     !(eqN a b) = true := by
   sorry
 
+
 /-
 ### Exercise: Summing up equal numbers
 
 Solve this by way of rewriting the right theorems or assumptions.
 -/
 
-theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by sorry
+theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by
+  sorry
+
 
 /-
 ### Exercise: Multiplying by zero
@@ -1287,7 +1280,9 @@ theorem plus_id : ∀ n m o : Nat, n = m → m = o → n + m = m + o := by sorry
 Solve this by way of rewriting the right theorems or assumptions.
 -/
 
-theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by sorry
+theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by
+  sorry
+
 
 /-
 ### Exercise: One ain't double
@@ -1295,6 +1290,8 @@ theorem mult_n_0_m_0 : ∀ n m : Nat, addN (mulN n 0) (mulN m 0) = 0 := by sorry
 Hint: you can discharge a contradiction `h` with `cases h`.
 -/
 
-theorem one_not_double : ∀ n, 1 = mulN 2 n → False := by sorry
+theorem one_not_double : ∀ n, 1 = mulN 2 n → False := by
+  sorry
+
 
 end Exercises
