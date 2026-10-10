@@ -4,7 +4,7 @@ The following `import` is used to bring here the definitions of the previous lec
 If you are working on `https://live.lean-lang.org/`, then remove the `import` and
 copy-and-paste the code of the previous lecture before this one.
 -/
-import PL_Lean.PL02_Nat
+import PL_Solutions.PL02_Nat
 
 
 set_option autoImplicit false
@@ -473,6 +473,23 @@ def leN : Nat → Nat → Bool
 -/
 
 theorem leN_refl (n : Nat) : leN n n = true := by
+  sorry
+
+
+/-
+### Exercise: Antisymmetricity of leN
+
+**Difficulty: 4/4 (challenge).**
+
+Prove that `leN` is antisymmetric.
+
+Hint: do `intro n` first, then induct on `n`, so that `m` stays quantified in
+the induction hypothesis.  Then split `m` with `cases`: the mixed cases
+(`zero` with `succ`, `succ` with `zero`) have a false hypothesis.
+In the `succ`, `succ` case, use the induction hypothesis.
+-/
+
+theorem leN_antisymm : ∀ n m, leN n m → leN m n → eqN n m := by
   sorry
 
 
