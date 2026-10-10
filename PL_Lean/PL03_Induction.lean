@@ -4,7 +4,7 @@ The following `import` is used to bring here the definitions of the previous lec
 If you are working on `https://live.lean-lang.org/`, then remove the `import` and
 copy-and-paste the code of the previous lecture before this one.
 -/
-import PL_Solutions.PL02_Nat
+import PL_Lean.PL02_Nat
 
 
 set_option autoImplicit false
