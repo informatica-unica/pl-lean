@@ -700,13 +700,13 @@ theorem addN_succ_right (n m : Nat) : addN n (m + 1) = (addN n m) + 1 := by rfl
 
 /-
 __Exercise__: prove the corresponding theorems for `mulN`:
-* `mulN_zero`: n * 0 = 0;
-* `mulN_succ`: n * (m+1) = n * m + n
+* `mulN_zero_right`: n * 0 = 0;
+* `mulN_succ_right`: n * (m+1) = n * m + n
 -/
 
-theorem mulN_zero (n : Nat) : mulN n 0 = 0 := by sorry
+theorem mulN_zero_right (n : Nat) : mulN n 0 = 0 := by sorry
 
-theorem mulN_succ (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by sorry
+theorem mulN_succ_right (n m : Nat) : mulN n (m + 1) = addN (mulN n m) n := by sorry
 
 
 end Proofs_by_simplification
