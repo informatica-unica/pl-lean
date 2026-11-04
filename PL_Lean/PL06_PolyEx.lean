@@ -1,4 +1,4 @@
-import PL_Solutions.PL06_Poly
+import PL_Lean.PL06_Poly
 
 /-
 # Exercises on polymorphic functions
