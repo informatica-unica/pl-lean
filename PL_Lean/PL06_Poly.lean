@@ -356,6 +356,9 @@ Lean normally infers both `u` and `A`, so using the function remains simple:
 example : identityU 7 = 7 := by rfl
 example : identityU true = true := by rfl
 
+example : identityU Nat = Nat := by rfl    -- we could not do this with `identityImplicit`
+example : identityU (Nat × Bool) = (Nat × Bool) := by rfl
+
 /-
 For the rest of the lecture, we will omit universes in polymorphic definitions.
 This has a downside, in that these functions are less general than they could be,
