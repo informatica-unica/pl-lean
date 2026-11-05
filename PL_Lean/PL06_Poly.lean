@@ -390,7 +390,7 @@ example : swapP ("Lean", 4) = (4, "Lean") := by rfl
 
 /-
 Note that `swapP` has two type parameters, since the two components may have
-different types. Its implementation does not need to know what them anyway.
+different types. Its implementation does not need to know them anyway.
 -/
 
 
@@ -399,7 +399,7 @@ the first component of a pair while preserving the second component.  Note that
 the new first component may have a *different* type from the old one, which is
 why the signature has three type parameters. -/
 
-def replaceFirst {A : Type} {B : Type} {C : Type w}
+def replaceFirst {A : Type} {B : Type} {C : Type}
     (newFirst : C) (p : A × B) : C × B :=
   sorry
 
@@ -599,8 +599,7 @@ the types of the following expressions, and which ones will be rejected.
 -- #check [Sum.inl 10, Sum.inr true, Sum.inl 20]
 -- #check [Sum.inl 10, Sum.inr 20]
 -- #check [Sum.inl 10, Sum.inl true]
-
-
+-- #check [Sum.inl 10, Sum.inl 5]
 
 section Pattern_matching_on_lists
 
@@ -642,8 +641,12 @@ example : tailL ([] : List Nat) = [] := by sorry
 def isEmptyL {A : Type} (xs : List A) : Bool :=
   sorry
 
-example : isEmptyL ([] : List Bool) = true  := by sorry
 example : isEmptyL [true, false] = false    := by sorry
+example : isEmptyL ([] : List Bool) = true  := by sorry
+
+/- Notice that the type annotation in the last example is necessary: try it! -/
+-- example : isEmptyL [] = true  := by sorry
+
 
 /-
 __Exercise (difficulty: 2/4)__ Prove that a list `l` is empty if and only if
@@ -656,7 +659,7 @@ theorem empty_no_head (A : Type) (l : List A) :
 
 
 /- __Exercise__ Formalize and prove a theorem stating that the tail of a list `l` is
-  empty whenever `l` is empty (use the functions `isEmptyL` and `tailL` given before).
+  empty if `l` is empty (use the functions `isEmptyL` and `tailL` given before).
 -/
 
 --- theorem nonempty_has_tail ...
