@@ -14,15 +14,15 @@ This is the foundation of Lean and of every proof assistant based on type theory
 
 Here is the correspondence that we will build, one row at a time:
 
-    Logic                 Types (programs)             Lean
-    --------------------  ---------------------------  ---------------------------
-    P → Q   (implies)     A → B     (functions)        P → Q
-    P ∧ Q   (and)         A × B     (pairs)            P ∧ Q
-    P ∨ Q   (or)          A ⊕ B     (tagged unions)    P ∨ Q
-    True                  Unit                         True
-    False                 Empty                        False
-    ¬P      (not)         A → Empty                    ¬P   (i.e., P → False)
-    P ↔ Q   (iff)         (A → B) × (B → A)            P ↔ Q
+    Logic                   Types
+    --------------------    ---------------------------
+    P → Q     (implies)     A → B       (functions)
+    P ∧ Q     (and)         A × B       (products)
+    P ∨ Q     (or)          A ⊕ B       (sums)
+    True                    Unit
+    False                   Empty
+    P → False (not)         A → Empty
+    P ↔ Q     (iff)         (A → B) × (B → A)
 
 By the end of the lecture, you should be able to:
 
