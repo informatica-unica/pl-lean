@@ -1,4 +1,4 @@
-import PL_Solutions.PL07_Prop
+import PL_Lean.PL07_Prop
 
 
 /-
