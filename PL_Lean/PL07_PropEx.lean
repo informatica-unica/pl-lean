@@ -175,8 +175,6 @@ The proposition `True` has exactly one proof, `True.intro` (the tactic `trivial`
 It corresponds to the type `Unit`, whose only value is `()`.
 -/
 
-#check and_swap_tac
-
 theorem and_swap_iff_tac {P Q : Prop} : P ∧ Q ↔ Q ∧ P := by
   sorry
 
@@ -184,22 +182,11 @@ theorem and_swap_iff_term {P Q : Prop} : P ∧ Q ↔ Q ∧ P :=
   sorry
 
 
-
-/- Prove the equivalence between "`P` and `Q` imply
-`R`" and "`P` implies (`Q` implies `R`)".  Tactic proof and term proof.
-Hint: you proved both directions earlier (`curry_tac`, `uncurry_tac`); you may reuse
-them, or write the proof from scratch.  Read the two proofs of each direction with
-`#print`. -/
-
 theorem curry_iff_tac {P Q R : Prop} : (P ∧ Q → R) ↔ (P → Q → R) := by
   sorry
 
 theorem curry_iff_term {P Q R : Prop} : (P ∧ Q → R) ↔ (P → Q → R) :=
   sorry
-
-
-/- __Exercise (difficulty: 2/4)__ Combine your De Morgan theorems into a single
-equivalence: `¬(P ∨ Q) ↔ ¬P ∧ ¬Q`.  Tactic proof and term proof. -/
 
 theorem de_morgan_tac {P Q : Prop} : ¬(P ∨ Q) ↔ ¬P ∧ ¬Q := by
   sorry
@@ -208,5 +195,52 @@ theorem de_morgan_term {P Q : Prop} : ¬(P ∨ Q) ↔ ¬P ∧ ¬Q :=
   sorry
 
 end Iff
+
+
+section Component_functions
+
+/- __Exercise (difficulty: 2/4)__  A function that takes the coproduct of two types
+can be decomposed along the domain into a pair of functions from each component type.
+
+From the Prop perspective, a predicate that talk about a disjunction can be split
+into two predicates talking about each side separately.
+-/
+
+def compfun_co_term_data {A B C : Type} : (A ⊕ B → C) → (A → C) × (B → C) :=
+sorry
+
+def compfun_co_tac_data {A B C : Type} : (A ⊕ B → C) → (A → C) × (B → C) := by
+sorry
+
+
+theorem compfun_co_term {P Q R : Prop} : (P ∨ Q → R) → (P → R) ∧ (Q → R) :=
+sorry
+
+theorem compfun_co_tac {P Q R : Prop} : (P ∨ Q → R) → (P → R) ∧ (Q → R) := by
+sorry
+
+
+/- __Exercise (difficulty: 2/4)__ There is a dual property of component functions
+for the product between types, but this time it works if the prodoct is the
+_codomain_ of the input function: a function that sends a type into the product
+of two other types can be decomposed along the codomain.
+
+This is also known as the _universal property_ of the product.
+-/
+
+def compfun_prod_term_data {A B C : Type} : (A → (B × C)) → (A → B) × (A → C) :=
+sorry
+
+def compfun_prod_tac_data {A B C : Type} : (A → (B × C)) → (A → B) × (A → C) := by
+sorry
+
+theorem compfun_prod_term {P Q R : Prop} : (P → (Q ∧ R)) → (P → Q) ∧ (P → R) :=
+sorry
+
+theorem compfun_prod_tac {P Q R : Prop} : (P → (Q ∧ R)) → (P → Q) ∧ (P → R) := by
+sorry
+
+end Component_functions
+
 
 end Exercises
