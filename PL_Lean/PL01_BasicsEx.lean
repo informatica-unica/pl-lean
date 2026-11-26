@@ -1,4 +1,4 @@
-import PL_Solutions.PL01_Basics
+import PL_Lean.PL01_Basics
 
 section Exercises
 
