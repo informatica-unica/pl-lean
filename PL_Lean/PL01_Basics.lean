@@ -1,5 +1,4 @@
 /-
-
 # Introduction to functional programming and theorem proving in Lean
 
 This file is both a lecture and a Lean program.  Read the comments from top to
@@ -17,10 +16,21 @@ In this lecture we will learn how to:
 * use functions as values;
 * state a few simple properties and prove them with basic tactics.
 
-The option `autoImplicit false` asks Lean to report undeclared names
-instead of silently turning some of them into implicit variables.  This tends
-to make beginner mistakes easier to diagnose.
+Throughout the lecture you will be asked to solve several exercises.
+Their difficulties use the following relative scale:
 
+* **1/4:** one direct idea;
+* **2/4:** two ideas must be combined;
+* **3/4:** a more substantial construction or proof;
+* **4/4:** an optional challenge.
+
+You find additional extended exercises in the file `PL01_BasicsEx.lean`.
+-/
+
+
+/-
+The option `autoImplicit false` asks Lean to report undeclared names instead of silently
+turning some of them into implicit variables. This makes beginner mistakes easier to detect.
 -/
 
 set_option autoImplicit false
@@ -29,7 +39,6 @@ set_option autoImplicit false
 section Reading_this_file
 
 /-
-
 ## How to read this file
 
 Text between `/-` and `-/` is a block comment.
@@ -48,11 +57,10 @@ backslash followed by an abbreviation and then a space.  For example:
 
 Hovering over a symbol normally shows one or more available abbreviations.
 This lecture mainly uses `→`, which denotes a function type.
-
 -/
 
 /-
-  __Exercise__: Type a formula involving a few symbols in a comment.
+  __Checkpoint 1__: Type a formula involving a few symbols in a comment.
   Don't worry if it is not valid Lean syntax for now.
 -/
 
@@ -62,7 +70,6 @@ end Reading_this_file
 section Queries
 
 /-
-
 ## Expressions, values, and types
 
 In an imperative language, we often think in terms of commands that update a
@@ -83,7 +90,6 @@ Lean provides three useful commands for exploration:
 
 These commands help us interact with Lean, but they do not become part of the
 program being defined.
-
 -/
 
 #check true         --- values have types
@@ -94,7 +100,6 @@ program being defined.
 #eval false
 
 /-
-
 Lean reports that `true` and `false` both have type `Bool`.
 
 The type name is capitalized: `Bool`.
@@ -129,7 +134,6 @@ def theLightIsOn : Bool := true
 #print theLightIsOn
 
 /-
-
 Read the declaration as follows:
 
 * `def` starts a definition;
@@ -139,7 +143,6 @@ Read the declaration as follows:
 
 A Lean definition is not a mutable variable.  There is no later assignment
 that changes `theLightIsOn` to `false`.  Definitions name values.
-
 -/
 
 end Defining_names
@@ -149,11 +152,9 @@ end Defining_names
 section Defining_functions
 
 /-
-
 ## Defining and applying functions
 
 A function definition lists its parameters before the result type.
-
 -/
 
 def negB (b : Bool) : Bool :=
@@ -164,7 +165,6 @@ def negB (b : Bool) : Bool :=
 #eval negB false
 
 /-
-
 The type of `negB` is:
 
     Bool → Bool
@@ -179,7 +179,6 @@ Function application is written by placing the argument after the function:
 In particular, Lean does not require the notation `negB(true)`.
 
 Multiple parameters can be written next to one another.
-
 -/
 
 def andB (a b : Bool) : Bool :=
@@ -191,7 +190,9 @@ def andB (a b : Bool) : Bool :=
 
 
 /-
-__Exercise__: Define a function `orB` that implements the disjunction connective
+__Exercise (difficulty: 1/4)__
+
+Define a function `orB` that implements the disjunction connective.
 -/
 
 def orB (a b : Bool) : Bool :=
@@ -199,21 +200,18 @@ def orB (a b : Bool) : Bool :=
 
 
 /-
+## Statements and proofs
 
-### Statements and proofs
-
-A main feature of Lean 4 is that is works as a *proof assistant*, in the sense that
+A main feature of Lean is that is works as a *proof assistant*, in the sense that
 it allows you to write statements and formally prove them.
 
 As a first example, we consider a basic equality that is true "by definition".
-
 -/
 
 theorem false_and_any_is_false (a: Bool): andB false a = false := by
   rfl
 
 /-
-
 We have introduced a new theorem, named `false_and_any_is_false`, stating that
 `andB false a` evaluates to `false` for any Bool parameter `a`.
 
@@ -225,31 +223,31 @@ definition of `andB`, the left-hand side becomes:
 which evaluates to `false`, since the `&&` operator has a short-circuit semantics.
 Therefore, both sides of the equality are identical, and `rfl` (reflexivity) closes the proof.
 
-Note that more complex statements usually require more complex tactics than `rfl`.
+More complex statements usually require more complex tactics than `rfl`.
 
 When we do not know how to complete a proof, wa can leave some parts of it unfinished,
 mark them with `sorry`.
-
-Here is an example:
 -/
 
 theorem andB_commutative_sorry (a b : Bool) : andB a b = andB b a := by sorry
 
+
 /-
-__Exercise__: Try to replace `sorry` with `rfl`, and see what happens in the Infoview.
+__Checkpoint__: Try to replace `sorry` with `rfl` in the previous proof,
+and see what happens in the Infoview.
 -/
+
 
 /-
 Using `sorry` has several benefits:
-* The incomplete code is accepted, without generating any _error_.
+* The incomplete code is accepted, without generating any error.
 * When putting the cursor over each occurrence of `sorry`, Lean reports what is
   the expected type of the term that should be written at that point.
 -/
 
 
 /-
-
-### Partial application
+## Partial application
 
 Lean displays the type of `andB` as:
 
@@ -259,12 +257,11 @@ Arrows associate to the right, so this means:
 
     Bool → (Bool → Bool)
 
-We may therefore supply the arguments one at a time.  Applying `andB` to only
+We may therefore supply the arguments one at a time. Applying `andB` to only
 one argument produces another function.
 
 This feature is called *partial application*.  It is one reason that functions
 are especially convenient in functional programming.
-
 -/
 
 #check andB true
@@ -273,27 +270,28 @@ def mystery : Bool → Bool :=
   andB true
 
 /-
-  __Exercise__: find a simpler way to define a function equivalent to the `mystery` above.
-  The function must satisfy the equality specified by the theorem `mystery_resolved`.
-  For the moment, leave the `sorry` in `mystery_resolved`.
+__Exercise (difficulty: 1/4)__
+
+Find a simpler way to define a function equivalent to the `mystery` above.
+The function must satisfy the equality specified by the theorem `mystery_resolved`.
+For the moment, leave the `sorry` in `mystery_resolved`.
 -/
 
-def mystery₂ : Bool → Bool := sorry
+def mystery₂ : Bool → Bool :=
+  sorry
 
-theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by sorry
+theorem mystery_resolved (b: Bool): mystery b = mystery₂ b := by
+  sorry
 
 
 /-
-
-### Anonymous functions
+## Anonymous functions
 
 Functions do not need to have names.  The expression
 
     fun b : Bool => !b
 
-is an anonymous function.  It plays a role similar to a lambda expression in
-other languages.
-
+is an anonymous function. It plays a role similar to a lambda expression in other languages.
 -/
 
 #check (fun b : Bool => !b)
@@ -312,11 +310,9 @@ def negLambda₂ : Bool → Bool :=
   λ b : Bool => !b
 
 /-
-
 The two definitions `negB` and `negLambda` compute exactly the same function.
 The first notation is usually more convenient when naming a function; the second
 makes it especially clear that functions are expressions and values.
-
 -/
 
 end Defining_functions
@@ -326,8 +322,7 @@ end Defining_functions
 section Boolean_operators
 
 /-
-
-## 3. Boolean operators
+## Boolean operators
 
 Lean provides the standard Boolean operations:
 
@@ -337,7 +332,6 @@ Lean provides the standard Boolean operations:
 
 The following examples define their truth tables.
 Examples can be seen as unnamed theorems.
-
 -/
 
 example : !true = false := by rfl
@@ -354,11 +348,8 @@ example : (true  || false) = true  := by rfl
 example : (true  || true)  = true  := by rfl
 
 /-
-
-We can build new Boolean operations from the existing ones.  Boolean
-implication is false only when its first input is true and its second input is
-false.
-
+We can build new Boolean operations from the existing ones.
+An implication is false only when its first input is true and its second input is false.
 -/
 
 def impB (a b : Bool) : Bool :=
@@ -370,20 +361,12 @@ example : (impB true  false) = false := by rfl
 example : (impB true  true)  = true  := by rfl
 
 /-
-__Exercise__: the *exclusive or* is true when exactly one input is true.
+__Exercise (difficulty: 1/4)__ The *exclusive or* is true when exactly one input is true.
 Define the connective, and give its truth table through examples.
 -/
 
-def xorB (a b : Bool) : Bool := sorry
-
-
-
-/-
-__Exercise__: the *nand* connective is true when not both inputs are true.
-Define the connective, and give its truth table through examples.
--/
-
-def nandB (a b : Bool) : Bool := sorry
+def xorB (a b : Bool) : Bool :=
+  sorry
 
 end Boolean_operators
 
@@ -392,16 +375,13 @@ end Boolean_operators
 section Conditional_expressions
 
 /-
-
 ## Conditional expressions
 
-In an imperative language, an `if` is often presented as a statement that
-chooses which commands to execute.
-In functional languages, an `if` is an expression: it computes a value.
+In an imperative language, an `if` is a *command* that chooses which branch to execute.
 
-Consequently, both branches must produce values of the same type, and an
-`else` branch is required.
+In functional languages, an `if` is an *expression*: it computes a value.
 
+So, both branches must produce values of the same type, and the `else` branch  is required.
 -/
 
 #eval if true  then 5 else 7
@@ -411,81 +391,64 @@ Consequently, both branches must produce values of the same type, and an
 #eval if andB true false then "hi" else "ciao"
 
 /-
-
 Note that there are no assignments and no `return` commands.  The value of the
 selected branch is the value of the whole `if`.
-
 -/
-
 
 /-
-__Exercise__: try to write a conditional expression where the `true` branch evaluates to
-a number, while the `false` branch evaluates to a string.
-Study the error displayed in the Infoview.
+__Checkpoint__: Try to write a conditional expression where the `true` branch evaluates to
+a number, while the `false` branch evaluates to a string. Check the error in the Infoview.
 -/
 
 
-/-
-__Exercise__: Redefine the negation using conditional expressions.
--/
+/- __Exercise (difficulty: 1/4)__ Redefine the negation using conditional expressions. -/
 
 def negIf (b : Bool) : Bool :=
   sorry
 
-example : negB true  = negIf true  := by sorry
-example : negB false = negIf false := by sorry
 
 /-
-__Exercise__: Redefine the implication connective using conditional expressions.
+__Exercise (difficulty: 1/4)__ Redefine the implication using conditional expressions.
 -/
 
 def impIf (a b : Bool) : Bool :=
   sorry
 
-example : (impIf false false) = true  := by sorry
-example : (impIf false true)  = true  := by sorry
-example : (impIf true  false) = false := by sorry
-example : (impIf true  true)  = true  := by sorry
 
-
-/-
-__Exercise__: Redefine the XOR connective using conditional expressions.
--/
+/- __Exercise (difficulty: 1/4)__ Redefine the XOR using conditional expressions. -/
 
 def xorIf (a b : Bool) : Bool :=
   sorry
 
-example : (xorIf false false) = false := by sorry
-example : (xorIf false true)  = true  := by sorry
-example : (xorIf true  false) = true  := by sorry
-example : (xorIf true  true)  = false := by sorry
-
 
 /-
 __Exercise__: Define a function `majority` that returns true when at least two
-of its three inputs are true.
+of its three inputs are true. Check if the tests below pass.
 -/
 
 def majority (a b c : Bool) : Bool :=
   sorry
 
-example : majority true false true = true   := by sorry
-example : majority false true true = true   := by sorry
-example : majority false true false = false := by sorry
+example : majority true false true = true   := by
+  sorry
 
+example : majority false true true = true   := by
+  sorry
+
+example : majority false true false = false := by
+  sorry
 
 end Conditional_expressions
+
 
 
 section Pattern_matching
 
 /-
-
 ## Pattern matching
 
-Because a Boolean has only two possible values, a function can explicitly say
+Since a Boolean has only two possible values, a function can explicitly say
 what to do in each case.
-
 -/
 
 def negMatch (b : Bool) : Bool :=
@@ -497,13 +460,10 @@ example : negMatch true = false := by rfl
 example : negMatch false = true := by rfl
 
 /-
-
-Lean checks that the patterns cover every possible input.  If either case is
+Lean checks that the patterns cover every possible input. If either case is
 deleted, Lean reports that the match is not exhaustive.
 
-There is also a compact equation style in which the parameters are matched
-directly.
-
+There is also a compact equation style in which the parameters are matched directly.
 -/
 
 def negMatch₂ : Bool → Bool
@@ -511,12 +471,10 @@ def negMatch₂ : Bool → Bool
   | false => true
 
 /-
-
 We can pattern-match on more than one input.
 Patterns are considered from top to bottom.
-The underscore `_` is a wildcard: it matches any value when we do not need
+The underscore `_` is a *wildcard*: it matches any value when we do not need
 to give that value a name.
-
 -/
 
 def andMatch : Bool → Bool → Bool
@@ -524,66 +482,37 @@ def andMatch : Bool → Bool → Bool
   | false, _ => false
 
 example : andMatch true false = false := by rfl
-example : andMatch false true = false := by rfl
 
 
-/-
-__Exercise__: Redefine the implication connective using pattern matching.
--/
+/- __Exercise (difficulty: 1/4)__: Redefine the implication using pattern matching. -/
 
-def impMatch : Bool → Bool → Bool := sorry
-
-example : (impMatch false false) = true  := by sorry
-example : (impMatch false true)  = true  := by sorry
-example : (impMatch true  false) = false := by sorry
-example : (impMatch true  true)  = true  := by sorry
+def impMatch (a b : Bool) : Bool :=
+  sorry
 
 
-/-
-__Exercise__: Redefine the XOR connective using pattern matching.
--/
-
-def xorMatch : Bool → Bool → Bool := sorry
-
-example : (xorMatch false false) = false := by sorry
-example : (xorMatch false true)  = true  := by sorry
-example : (xorMatch true  false) = true  := by sorry
-example : (xorMatch true  true)  = false := by sorry
+example : (impMatch false false) = true  := by
+  sorry
 
 
+/- __Exercise__: Redefine the XOR using pattern matching. -/
 
-/-
-__Exercise__: Redefine the NAND connective using pattern matching.
--/
+def xorMatch (a b : Bool) : Bool :=
+  sorry
 
-def nandMatch : Bool → Bool → Bool := sorry
-
-example : (nandMatch false false) = true  := by sorry
-example : (nandMatch false true)  = true  := by sorry
-example : (nandMatch true  false) = true  := by sorry
-example : (nandMatch true  true)  = false := by sorry
-
-/-
-
-The Boolean operators, conditionals, and pattern matching are not competing
-features.  They are alternative tools.  Choose the form that communicates the
-function most clearly.
-
--/
+example : (xorMatch false false) = false := by
+  sorry
 
 end Pattern_matching
+
 
 
 section Local_definitions
 
 /-
-
 ## Local names with `let`
 
-A complex expression can be made easier to read by giving an intermediate
-result a local name.  A `let` binding is not mutable: it names a value for the
-rest of the expression.
-
+A complex expression can be made easier to read by giving an intermediate result a
+local name. A `let` binding is not mutable: it names a value for the rest of the expression.
 -/
 
 def alarmShouldSound
@@ -595,11 +524,8 @@ def alarmShouldSound
 #eval alarmShouldSound false true true
 
 /-
-
-Compare this with an imperative local variable.  We do not first store one
-value in `intrusion` and later overwrite it.  The name always denotes the same
-value within its scope.
-
+Compare this with an imperative local variable. We do not first store one value in
+`intrusion` and later overwrite it. The name always denotes the same value within its scope.
 -/
 
 end Local_definitions
@@ -608,15 +534,12 @@ end Local_definitions
 section Functions_as_values
 
 /-
-
 ## Higher-order functions
 
 Functions may be passed as arguments to other functions.  A function that
 accepts or returns another function is called a *higher-order function*.
 
-`applyTwice` accepts a function `f` and a Boolean `b`, then applies `f` two
-times.
-
+`applyTwice` accepts a function `f` and a Boolean `b`, then applies `f` two times.
 -/
 
 def applyTwice (f : Bool → Bool) (b : Bool) : Bool :=
@@ -626,11 +549,9 @@ def applyTwice (f : Bool → Bool) (b : Bool) : Bool :=
 #eval applyTwice negB false
 
 /-
-
-The parameter `f` is used just like any other value.  This ability is central
+The parameter `f` is used just like any other value. This ability is central
 to functional programming and later supports reusable operations over lists,
 trees, state transition systems, and many other structures.
-
 -/
 
 end Functions_as_values
@@ -640,7 +561,6 @@ end Functions_as_values
 section Proofs_basics
 
 /-
-
 ## Proofs basics
 
 Lean is both a programming language and a theorem prover.  After defining a
@@ -650,7 +570,7 @@ We have already proved some equations involving fixed Boolean values, such as:
 
     andB true true = true
 
-These proofs can be completed with `rfl`. To check `rfl`, Lean unfolds the
+These proofs can be completed with `rfl`. To check `rfl`, Lean *unfolds* the
 definitions and performs the relevant computations. If both sides reduce to
 the same expression, the equality is proved.
 
@@ -667,11 +587,11 @@ theorem false_and_any_is_false_forall :
   rfl
 
 /-
-The symbol `∀` means “for all”. Thus, the statement below reads:
+The symbol `∀` means "for all". Thus, the statement below reads:
 
     For all Boolean values `a`, `andB false a` is equal to `false`.
 
-To prove theorems of this form, we usually start by saying "Suppose a is some Boolean ..."
+To prove theorems of this form, we usually start by saying "Suppose `a` is some Boolean ..."
 Formally, this is rendered in the proof by `intros a`, which moves `a` from the quantifier
 to the goal (place your cursor after the `intro a` and see what happend in the Infoview).
 
@@ -682,6 +602,7 @@ Then, the proof can be closed with `rfl`, since as we noted before `&&` is short
 -/
 
 /-
+## Propositions versus Boolean values
 
 An important but subtle point is that Lean distinguishes Boolean values from propositions:
 
@@ -690,14 +611,25 @@ An important but subtle point is that Lean distinguishes Boolean values from pro
 
 In particular, in our theorem `false_and_any_is_false`:
 * `andB false a` computes a `Bool`;
-* `anddB false a = false` is a proposition asserting an equality.
+* `andB false a = false` is a proposition asserting an equality.
 
 The commands `example` and `theorem` state a proposition and ask you to provide a proof.
 
+We will clarify this distinction in a future lab lecture: for the moment, we just focus
+on Boolean values and implicitly deal with propositions when stating theorems.
+-/
+
+/-
+## The `cases` tactic
+
 We state below that Boolean negation is *involutory*, i.e. applying it twice results
 in the original value. Its proof cannot be accomplished through reflexivity only
-(__Exercise__: try `rfl` and see what happens in the Infoview.)
+(try `rfl` and see what happens in the Infoview).
 
+So, in this proof we introduce a new tactic: `cases`.
+
+The tactic `cases b` creates one goal for `b = false` and another for `b = true`.
+In our theorem, in each case the equality follows by computation, so `rfl` finishes it.
 -/
 
 theorem neg_is_involutory (b : Bool) : negB (negB b) = b := by
@@ -705,12 +637,22 @@ theorem neg_is_involutory (b : Bool) : negB (negB b) = b := by
   | false => rfl
   | true  => rfl
 
+
 /-
-
-The tactic `cases b` creates one goal for `b = false` and another for `b = true`.
-In each case the equality follows by computation, so `rfl` finishes it.
-
+__Exercise (difficulty: 1/4)__ Prove that `negB` and `negIf` are equivalent.
 -/
+
+example (b : Bool): negB b  = negIf b  := by
+  sorry
+
+
+/-
+__Exercise (difficulty: 1/4)__ Prove that `impB` and `impIf` are equivalent.
+-/
+
+example (a b : Bool) : impB a b = impIf a b := by
+  sorry
+
 
 /-
 The `cases` tactic can be nested, similarly to conditional expressions.
@@ -728,6 +670,15 @@ theorem andB_commutative (a b : Bool) : andB a b = andB b a := by
 
 
 /-
+__Exercise (difficulty: 2/4)__ Prove that `xorB` and `xorMatch` are equivalent.
+-/
+
+example (a b : Bool) : xorB a b = xorMatch a b := by
+  sorry
+
+
+/-
+## The `simp` tactic
 
 The `simp` tactic repeatedly applies a collection of standard simplification rules.
 It is convenient for routine Boolean identities.
@@ -738,189 +689,29 @@ For example, the following theorem states that true is a right identity of conju
 theorem and_true_right (b : Bool) : andB b true = b := by
   simp [andB] --- unfold andB and apply known simplification rules for &&
 
-/-
-An alternative proof can be done via case analysis.
--/
+
+/- An alternative proof can be done via case analysis. -/
+
 theorem and_true_right_cases (b : Bool) : andB b true = b := by
   cases b with
   | false => rfl
   | true  => rfl
 
 
-/-
-__Exercise__: Prove that false is a right identity of disjunction.
--/
+/- __Exercise (difficulty: 1/4)__: Prove that false is a right identity of disjunction. -/
 
 theorem or_false_right (b : Bool) : orB b false = b := by
   sorry
 
-/-
 
-These proofs are intentionally small.  Their purpose is to show the basic
-workflow:
+/-
+These proofs are intentionally small.  Their purpose is to show the basic workflow:
 
 1. define a function;
 2. state a precise property;
 3. inspect the proof state in the Infoview;
 4. use tactics to reduce the goal to elementary cases;
 5. let Lean's kernel check the completed proof.
-
 -/
 
 end Proofs_basics
-
-
-section Exercises
-
-/-
-
-## Exercises
-
-Replace each `sorry` with a definition or proof.
-
-Try to solve each exercise before looking back at similar examples.
-
--/
-
-
-/-
-
-### Exercise: NOR
-
-Define NOR using Boolean operators.  It should be true exactly when both inputs are false.
-Then, prove that NOR enjoys commutativity.
-
-Hint: negate an appropriate use of `||`.
-
--/
-
-def norB (a b : Bool) : Bool :=
-  sorry
-
-example : norB false false = true := by
-  sorry
-
-example : norB true false = false := by
-  sorry
-
-
-theorem nor_commutative (a b : Bool) :
-    norB a b = norB b a := by
-  sorry
-
-
-/-
-
-### Exercise: Negation agrees with pattern matching
-
-Prove the following theorem. Hint: split into the two cases for `b`, then use `rfl`.
-
--/
-
-theorem negB_eq_negMatch : ∀ b : Bool,
-    negB b = negMatch b := by
-  sorry
-
-
-/-
-
-### Exercise: Conjunction agrees with pattern matching
-
-Prove the following theorem.
-
--/
-
-theorem andB_eq_andMatch : ∀ a b : Bool,
-  andB a b = andMatch a b := by
-  sorry
-
-
-/-
-
-### Exercise: Associativity of AND
-
-State and prove the associativity of conjunction: a && (b && c) = (a && b) && c
--/
-
---- theorem and_associative (a b : Bool) : ... := sorry
-
-/-
-Hint: mind the priority of the operators && and =.
-You can put your mouse over them in the Infoview to see what operands Lean
-automatically groups together in the absence of parentheses.
--/
-
-/-
-
-### Exercise: All three
-
-Define a function that returns true exactly when all three arguments are true.
-First use Boolean operators.  Then try a conditional or pattern matching.
-Finally, show that the two definitions are equivalent.
--/
-
-def allThree (a b c : Bool) : Bool :=
-  sorry
-
-example : allThree true true true = true := by
-  sorry
-
-example : allThree true false true = false := by
-  sorry
-
-def allThreeMatch (a b c : Bool) : Bool :=
-  sorry
-
-example (a b c : Bool) : allThree a b c = allThreeMatch a b c := by sorry
-
-
-/-
-
-### Exercise: De Morgan's law
-
-Here is a small theorem requiring all four Boolean cases.
-It is the Boolean form of one of De Morgan's laws.
-
--/
-
-theorem deMorgan_nand (a b : Bool) :
-    !(a && b) = ((!a) || (!b)) :=
-  sorry
-
-
-/-
-
-### Exercise: Multiplexer
-
-Write a function of type:
-
-mux2 : Bool → Bool → Bool → Bool
-
-such that `mux2 s0 a b` equals to `a` if `s0` is true, otherwise it equals to `b`.
-
-Try with different implementation styles, using:
-* the built-in logical connectives `!`, `&&`, `||`;
-* conditional expressions;
-* pattern matching.
-
-Then, write a function of type:
-
-mux4 : Bool → Bool → Bool → Bool → Bool → Bool → Bool
-
-such that `mux4 s1 s0 a0 a1 a2 a3` equals to `ai` if `s1 s0` is the binary encoding of `i`.
-
-In the implementation of `mux4`, try to reuse `mux2`.
-
--/
-
-def mux2 (s0 a b : Bool) : Bool := sorry
-
-def mux4 (s0 s1 a0 a1 a2 a3 : Bool) : Bool := sorry
-
-example : mux4 false false false true false true = false := sorry
-example : mux4 false true false true false true = true   := sorry
-example : mux4 true false false true false true = false  := sorry
-example : mux4 true true false true false true = true    := sorry
-
-
-end Exercises
