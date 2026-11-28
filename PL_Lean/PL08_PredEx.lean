@@ -301,26 +301,26 @@ theorem forall_or_exists {A : Type} {P Q : A → Prop} :
 /-
 __Exercise (difficulty: 4/4)__ The drinker paradox.
 
-The argument does not claim that the selected person drinks. If everybody
-drinks, choose any person. Otherwise, choose a person who does not drink.
+Interpret `A` as the people in a nonempty pub and `P x` as “`x` is drinking”.
+The theorem `drinker_paradox` says:
 
-Hint: use excluded middle on `∀ y, P y`.
+    There is someone such that, if they are drinking, everybody is drinking.
+
+It is called a paradox because this sounds as if one person's drinking somehow
+caused everybody else to drink. Logically, however, it is straightforward:
+
+* if everybody is drinking, choose any person;
+* otherwise, choose someone who is not drinking. For that person, the
+  implication is true because its premise `P x` is false.
+
+Thus, the theorem neither claims that the selected person drinks nor expresses
+a causal relationship. The argument is classical because it uses *excluded middle*
+on `∀ y, P y`. The parameter `a : A` guarantees that the pub is nonempty.
 -/
 
 theorem drinker_paradox {A : Type} (a : A) (P : A → Prop) :
     ∃ x, P x → ∀ y, P y := by
-  rcases Classical.em (∀ y, P y) with hp | hnp
-  . exists a
-    intro pa
-    apply hp
-  . have nex : ∃ x, ¬ P x := by
-      apply not_forall_exists_not
-      exact hnp
-    rcases nex with ⟨a,ha⟩
-    exists a
-    intro pa
-    contradiction
-
+  sorry
 
 end Classical_boundary
 
@@ -452,6 +452,179 @@ theorem nat_induction_term
 
 
 end Dependent_types
+
+
+
+section Divisibility
+
+/-
+Number Theory gives us an interesting application of dependent types:
+the notion of **divisibility**.
+In the realm of Integers, we say an integer `d` divides an integer `n` if `n`
+is a multiple of `d`.
+
+Stated as a proposition, there exists a number `k` that can multiply `d` to yield `n`.
+-/
+
+def DivDef (d n : Int) := ∃ k, n = d * k
+
+infix:55 " | " => DivDef
+
+/-
+To prove that an integer divides another, we must come up with the factor `k`.
+-/
+
+example : 2 | 10 := by exists 5
+example : 5 | 10 := by exists 2
+example : 5 | -15 := by exists -3
+
+/-
+On the flip side, when we have a divisibility hypothesis we can extract the factor `k`
+and derive something else algebraically.
+-/
+
+example (z : Int) : 4 | z → 2 | z := by
+  intro h
+  rcases h with ⟨k, hk⟩
+  exists k * 2
+  rw [hk]
+  omega
+
+
+example : ¬ 3 | 10 := by
+  intro contra
+  rcases contra with ⟨k, hk⟩
+  omega
+
+/-
+We've introduced the operator `|` to make the theorems and proofs look nicer but
+keep in mind that it's an existential proposition in disguise: we prove it with `exists`
+when it appears in the goal and unpack it with `rcases` when it is an assumption.
+
+The same applies for the congruence notation we introduce later.
+
+As you can see in the example proofs above, the `omega` tactic is your friend.
+Exploit it to quickly prove boring arithmetic equations. You should also rely on
+the algebraic theorems of the `Int` library often to do the following exercises.
+-/
+
+
+/-
+__Exercise (difficulty: 1/4)__ Prove that 1 divides any number.
+-/
+
+theorem one_div_any (z : Int) : 1 | z := by
+sorry
+
+
+/-
+__Exercise (difficulty: 1/4)__ Prove that any number divides zero.
+-/
+
+theorem any_div_zero (z : Int) : z | 0 := by
+sorry
+
+
+/-
+__Exercise (difficulty: 2/4)__ Zero only divides itself.
+-/
+theorem zero_div_zero (z : Int) : 0 | z ↔ z = 0 := by
+sorry
+
+
+/-
+__Exercise (difficulty: 3/4)__ Divisibility is transitive.
+
+Hint: you will need `Int.mul_assoc` after locating the witness.
+-/
+
+theorem div_trans (x y z : Int) : x | y → y | z → x | z := by
+sorry
+
+
+section Congruences
+
+/-
+We say that two integers `a` and `b` are _congruent modulus `m`_ if `m` divides their difference.
+The classical meaning of this is that `a` and `b` leave the same remainder when divided by `m`.
+
+Since it is a divisibility statement under the hood, we prove and work with congruences
+using the same tactics of existential statements.
+-/
+
+def CongrDef (a b m : Int) := m | a - b
+
+/- Use `\equiv` for the symbol `≡` -/
+notation a " ≡ " b " (mod " m ")" => CongrDef a b m
+
+example : 10 ≡ 3 (mod 7) := by exists 1
+example : 10 ≡ -4 (mod 7) := by exists 2
+example : (-1) ≡ 10 (mod 11) := by exists -1
+
+
+/-
+__Exercise (difficulty: 1/4)__ Every pair of integers is congruent modulus 1.
+-/
+
+theorem any_cong_one (a b : Int) : a ≡ b (mod 1) := by
+sorry
+
+
+/-
+__Exercise (difficulty: 2/4)__ A multiple of `m` leaves zero as remainder when divided by `m`.
+
+This theorem bridges divisibility and congruence.
+-/
+
+theorem div_imp_mod_zero (a m : Int) : m | a → a ≡ 0 (mod m) := by
+sorry
+
+
+/-
+__Exercise (difficulty: 3/4)__ Congruence modulus `m` is a symmetric relation over integers.
+
+Hint: massage the goal with `Int.neg_sub` and `Int.mul_neg`.
+-/
+
+theorem mod_symm (a b m : Int) : a ≡ b (mod m) → b ≡ a (mod m) := by
+sorry
+
+
+/-
+__Exercise (difficulty: 1/4)__ Shifting by multiples of the modulus is a closed operation.
+-/
+
+theorem mod_shift (k d m : Int) : (m * k + d) ≡ d (mod m) := by
+sorry
+
+
+/-
+__Exercise (difficulty: 2/4)__ Two numbers that differ only by multiples of ten
+leave the same remainder when divided by 2.
+-/
+
+theorem divisibility_2 (k d : Int) : (10 * k + d) ≡ d (mod 2) := by
+sorry
+
+/-
+Note: since any integer can be decomposed as `10 * k + d`, where `d` is the last digit,
+this means divisibility by 2 depends only on the last digit of a decimal number.
+
+Let's derive a more general statement!
+-/
+
+/-
+__Exercise (difficulty: 4/4)__ Divisibility by 2^n depends only on the last n digits of a decimal number.
+
+Hint: by induction on `n`. Simplify with the exponents with `Int.pow_succ` in the inductive case.
+-/
+
+theorem divisibility_pow2 (k d : Int) : ∀ n : Nat, (10^n * k + d) ≡ d (mod 2^n) := by
+sorry
+
+end Congruences
+
+end Divisibility
 
 
 end Exercises
